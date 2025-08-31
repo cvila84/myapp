@@ -1,0 +1,21 @@
+{
+  "name": "Bun",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "latest"
+    }
+  },
+  "containerEnv": {
+    "GIT_REPO_URL": "https://scm.vilanet.fr/kriss/slot"
+  },
+  "customizations": {
+    "jetbrains": {
+      "backend": "WebStorm"
+    }
+  },
+  "forwardPorts": [5173],
+  "workspaceFolder": "/workspace",
+  "//": "workspaceMount: source=jb_devcontainer_sources_f31d2e11122d7a0f1e78fb3337cc2916,target=/workspace,type=volume",
+  "//": "postCreateCommand: if [ ! -d .git ]; then git clone $GIT_REPO_URL .; fi"
+}

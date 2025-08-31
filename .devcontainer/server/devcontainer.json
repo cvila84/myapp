@@ -1,0 +1,18 @@
+{
+  "name": "OpenJDK21",
+  "build": {
+    "dockerfile": "Dockerfile",
+  },
+  "containerEnv": {
+    "GIT_REPO_URL": "https://scm.vilanet.fr/kriss/slot"
+  },
+  "customizations": {
+    "jetbrains": {
+      "backend": "IntelliJ"
+    }
+  },
+  "forwardPorts": [8080],
+  "workspaceFolder": "/workspace",
+  "//": "workspaceMount: source=jb_devcontainer_sources_f31d2e11122d7a0f1e78fb3337cc2916,target=/workspace,type=volume",
+  "//": "postCreateCommand: if [ ! -d .git ]; then git clone $GIT_REPO_URL .; fi"
+}
