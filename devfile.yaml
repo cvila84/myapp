@@ -1,0 +1,29 @@
+schemaVersion: 2.1.0
+metadata:
+  name: JetBrains IntelliJ IDEA Ultimate
+components:
+  - name: intellij-ultimate
+    container:
+      image: 'quay.io/che-incubator/che-idea-ultimate:next'
+      volumeMounts:
+        - name: projector-user
+          path: /home/projector-user
+      mountSources: true
+      memoryLimit: 4096M
+      memoryRequest: 512Mi
+      cpuLimit: 2000m
+      cpuRequest: 200m
+      endpoints:
+        - name: intellij
+          attributes:
+            type: main
+            cookiesAuthEnabled: true
+            urlRewriteSupported: true
+            discoverable: false
+          path: /
+          targetPort: 8887
+          exposure: public
+          secure: false
+          protocol: https
+  - name: projector-user
+    volume: {}
