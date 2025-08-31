@@ -26,6 +26,7 @@ App template following some standards
 
 ### Database
 - PostgreSQL / Mongo
+- Migration (liquidbase, flyway)
 
 ### Configuration
 - X-Context approach (override conf by request)
@@ -56,3 +57,4 @@ App template following some standards
 ### API
 - OpenAPI swagger
 - Apicurio (lint)
+- Smartbear
