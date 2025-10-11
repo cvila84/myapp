@@ -7,7 +7,7 @@ App template following some standards
 - Project: Hugo
 
 ### Observability
-- Otel
+- Otel stack (Prometheus + Loki + Tempo + Grafana)
 - UI batched logs to server endpoint
 - Thanos (long-lived + consolidation)
 - Zabbix
