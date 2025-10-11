@@ -12,6 +12,9 @@ App template following some standards
 - Thanos (long-lived + consolidation)
 - Zabbix
 
+### Analytics
+- Matomo
+
 ### Test
 - PACT (backend-backend)
 - squashtest.com
