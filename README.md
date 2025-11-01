@@ -2,18 +2,11 @@
 
 App template following some standards
 
-### Documentation
-- Dev: Backstage (security, alerting, CI/CD, configuration, observability, infra)
-- Project: Hugo
-
-### Observability
-- Otel stack (Prometheus + Thanos + Loki + Tempo + Grafana)
-- UI batched logs to server endpoint
-- Thanos (long-lived + consolidation)
-- Zabbix
-
-### Analytics
-- Matomo
+### Build
+- Maven
+- Gitea/Gitlab actions
+- Devcontainer
+- Devfile
 
 ### Test
 - PACT (backend-backend)
@@ -27,37 +20,50 @@ App template following some standards
 - Docker
 - Helm
 
+### Frontend
+- React
+- Shadcn UI
+- TailwindCSS
+- Websocket
+
+### Backend
+- Quarkus
+
 ### Database
 - PostgreSQL / Mongo
 - Migration (liquidbase, flyway)
+
+### Storage
+- MinIO
+
+### API
+- OpenAPI swagger
+- Apicurio (lint)
+- Smartbear
+
+### Dev Portal
+- Backstage (SCM, CI/CD, installation, configuration, operations, security, observability, alerting, analytics)
+- Hugo
+
+### Observability
+- Otel stack (Prometheus + Thanos + Loki + Tempo + Grafana)
+- Zabbix (alerting)
+- UI batched logs to server endpoint
+
+### Analytics
+- ELK (Log analytics)
+- Matomo (Web analytics)
 
 ### Configuration
 - X-Context approach (override conf by request)
 - Simple vs. profile parameters
 - Multi-tenancy ?
 
-### Technical
+### Messaging
+- RabbitMQ
+
+### Cache
 - Redis (create async request API endpoint)
-- Websocket UI - server
 
 ### Auth
 - Dex
-
-### Backend
-- Quarkus
-
-### UI
-- React
-- Shadcn UI
-- TailwindCSS
-
-### Build
-- Maven
-- Gitea/Gitlab actions
-- Devcontainer
-- Devfile
-
-### API
-- OpenAPI swagger
-- Apicurio (lint)
-- Smartbear
