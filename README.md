@@ -51,7 +51,7 @@ App template following some standards
 - UI batched logs to server endpoint
 
 ### Analytics
-- ELK (Log analytics)
+- ELK with OpenSearch (Log analytics)
 - Matomo (RUM / Web analytics)
 - Grafana Faro (RUM / Web analytics)
 
