@@ -52,7 +52,8 @@ App template following some standards
 
 ### Analytics
 - ELK (Log analytics)
-- Matomo (Web analytics)
+- Matomo (RUM / Web analytics)
+- Grafana Faro (RUM / Web analytics)
 
 ### Configuration
 - X-Context approach (override conf by request)
