@@ -1,13 +1,10 @@
 {
-  "name": "Bun",
+  "name": "myapp-ui",
   "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "VARIANT": "latest"
-    }
+    "dockerfile": "Dockerfile"
   },
   "containerEnv": {
-    "GIT_REPO_URL": "https://scm.vilanet.fr/kriss/slot"
+    "GIT_REPO_URL": "https://github.com/cvila84/myapp"
   },
   "customizations": {
     "jetbrains": {

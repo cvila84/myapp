@@ -1,6 +1,50 @@
-FROM debian:bookworm
+FROM debian:trixie
 
-ARG NODE_VERSION=22.17.1
+RUN groupadd debian \
+      --gid 1000 \
+    && useradd debian \
+      --uid 1000 \
+      --gid debian \
+      --shell /bin/bash \
+      --create-home
+
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends \
+    ca-certificates \
+    curl \
+    dirmngr \
+    git \
+    gnupg \
+    gpg \
+    gpg-agent \
+    libatomic1 \
+    nano \
+    python3 \
+    unzip \
+    vim-tiny \
+    wget \
+    xz-utils \
+    && apt-get auto-remove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo 'export PS1="\e[01;32m\u\e[m:\e[01;34m\w\e[m\$ "' >> /home/debian/.bashrc
+
+ENV JAVA_HOME=/opt/java/openjdk
+COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+ENV MAVEN_HOME=/opt/maven
+ENV PATH=$MAVEN_HOME/bin:$PATH
+
+ARG MAVEN_VERSION=3.9.11
+ARG BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+
+RUN mkdir -p $MAVEN_HOME \
+ && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+ && tar -xzf /tmp/apache-maven.tar.gz -C $MAVEN_HOME --strip-components=1 \
+ && rm -f /tmp/apache-maven.tar.gz
+
+ARG NODE_VERSION=22.20.0
 RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
     && case "${dpkgArch##*-}" in \
       amd64) ARCH='x64' OPENSSL_ARCH='linux-x86_64';; \
@@ -12,9 +56,6 @@ RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
       *) echo "unsupported architecture"; exit 1 ;; \
     esac \
     && set -ex \
-    # libatomic1 for arm
-    && apt-get update && apt-get install -y ca-certificates curl wget gnupg dirmngr xz-utils libatomic1 --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* \
     # use pre-existing gpg directory, see https://github.com/nodejs/docker-node/pull/1895#issuecomment-1550389150
     && export GNUPGHOME="$(mktemp -d)" \
     # gpg keys listed at https://github.com/nodejs/node#release-keys
@@ -28,8 +69,8 @@ RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
       108F52B48DB57BB0CC439B2997B01419BD92F80A \
       A363A499291CBBC940DD62E41F10027AF002F8B0 \
     ; do \
-      gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key" ; \
-      gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$key" || \
+      gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key" || \
+      gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$key" ; \
     done \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH.tar.xz" \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -41,34 +82,15 @@ RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
     && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
     # Remove unused OpenSSL headers to save ~34MB. See this NodeJS issue: https://github.com/nodejs/node/issues/46451
     && find /usr/local/include/node/openssl/archs -mindepth 1 -maxdepth 1 ! -name "$OPENSSL_ARCH" -exec rm -rf {} \; \
-    && apt-mark auto '.*' > /dev/null \
-    && find /usr/local -type f -executable -exec ldd '{}' ';' \
-      | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
-      | sort -u \
-      | xargs -r dpkg-query --search \
-      | cut -d: -f1 \
-      | sort -u \
-      | xargs -r apt-mark manual \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && npm install -g npm \
+    && npm install -g @anthropic-ai/claude-code \
     # smoke tests
     && node --version \
     && npm --version \
     && rm -rf /tmp/*
 
-ARG BUN_VERSION=latest
-RUN apt-get update -qq \
-    && apt-get install -qq --no-install-recommends \
-      ca-certificates \
-      curl \
-      dirmngr \
-      gpg \
-      gpg-agent \
-      unzip \
-      python3 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && arch="$(dpkg --print-architecture)" \
+ARG BUN_VERSION=1.2.22
+RUN arch="$(dpkg --print-architecture)" \
     && case "${arch##*-}" in \
       amd64) build="x64-baseline";; \
       arm64) build="aarch64";; \
@@ -108,43 +130,8 @@ RUN apt-get update -qq \
     && rm -f "bun-linux-$build.zip" SHASUMS256.txt.asc SHASUMS256.txt \
     && chmod +x /usr/local/bin/bun
 
-COPY docker-entrypoint.sh /usr/local/bin
-RUN mkdir -p /usr/local/bun-node-fallback-bin && ln -s /usr/local/bin/bun /usr/local/bun-node-fallback-bin/node
-ENV PATH="${PATH}:/usr/local/bun-node-fallback-bin"
+# Set the default user
+USER debian
 
-# Disable the runtime transpiler cache by default inside Docker containers.
-# On ephemeral containers, the cache is not useful
-ARG BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
-ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=${BUN_RUNTIME_TRANSPILER_CACHE_PATH}
-
-# Ensure `bun install -g` works
-ARG BUN_INSTALL_BIN=/usr/local/bin
-ENV BUN_INSTALL_BIN=${BUN_INSTALL_BIN}
-
-RUN groupadd bun \
-      --gid 1000 \
-    && useradd bun \
-      --uid 1000 \
-      --gid bun \
-      --shell /bin/sh \
-      --create-home \
-    && ln -s /usr/local/bin/bun /usr/local/bin/bunx \
-    && which bun \
-    && which bunx \
-    && bun --version
-
-RUN apt-get update \
-    && apt-get -y install --no-install-recommends \
-    ca-certificates \
-    git \
-    nano \
-    vim-tiny \
-    && apt-get auto-remove -y \
-    && apt-get clean -y \
-    && chsh -s $(which bash) bun \
-    && echo 'export PS1="\e[01;32m\u\e[m:\e[01;34m\w\e[m\$ "' >> /home/bun/.bashrc
-
-USER bun
-WORKDIR /home/bun
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/bun"]
+# Set the working directory
+WORKDIR /home/debian

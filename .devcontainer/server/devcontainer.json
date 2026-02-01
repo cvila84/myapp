@@ -1,10 +1,10 @@
 {
-  "name": "OpenJDK21",
+  "name": "myapp-server",
   "build": {
-    "dockerfile": "Dockerfile",
+    "dockerfile": "Dockerfile"
   },
   "containerEnv": {
-    "GIT_REPO_URL": "https://scm.vilanet.fr/kriss/slot"
+    "GIT_REPO_URL": "https://github.com/cvila84/myapp"
   },
   "customizations": {
     "jetbrains": {
