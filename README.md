@@ -64,15 +64,19 @@ App template following some standards
 ### Observability & Alerting
 - Otel
 - Loki (frontend/backend logging)
-- Prometheus
+- ELK (log analytics)
+- Prometheus (monitoring)
 - Thanos (metrics consolidation)
-- Zabbix
-- PostHog
+- Tempo (tracing)
+- Zabbix (system alerting)
+- Faro (RUM)
+- Matomo / PostHog / Faro (RUM / Web analytics)
 
 ### Frontend
 - React
 - Shadcn UI
 - TailwindCSS
+- Websocket
 
 ### Backend
 - Quarkus
@@ -82,6 +86,7 @@ App template following some standards
 - PostgreSQL / MongoDB
 
 ### Middleware
-- Redis (for async API endpoint)
+- Redis (cache)
+- MinIO (S3 local storage)
+- RabbitMQ
 - Kafka
-- Websocket (frontend <-> backend)
