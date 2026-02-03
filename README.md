@@ -73,14 +73,13 @@ App template following some standards
 - Matomo / PostHog / Faro (RUM / Web analytics)
 
 ### Frontend
-- React
+- React (with Kea)
 - Shadcn UI
 - TailwindCSS
 - Websocket
 
 ### Backend
-- Quarkus
-- Springboot
+- Quarkus / Spring boot
 
 ### Database
 - PostgreSQL / MongoDB
