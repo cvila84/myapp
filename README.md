@@ -22,6 +22,7 @@ App template following some standards
     - CI/CD (build, test, SCA and SAST reports)
     - Dependencies
     - Docs (Hugo links)
+    - API portal
   - Run
     - Observability
     - Alerting
